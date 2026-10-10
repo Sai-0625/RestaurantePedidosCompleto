@@ -17,6 +17,8 @@ public class RestauranteApp {
     private static final ReportesManager REPORTES = new ReportesManager(DATOS);
 
     public static void main(String[] args) {
+        DatosPrueba.cargar(USUARIOS, CATALOGO, MESAS);
+        System.out.println("Datos de prueba cargados. Mesero: mesero / 1234 | Domiciliario: domiciliario / 1234");
         int opcion;
         do {
             System.out.println("\n=== SISTEMA DE RESTAURANTE ===\n1. Usuarios\n2. Catálogo\n3. Mesas\n4. Pedidos\n5. Reportes\n0. Salir");

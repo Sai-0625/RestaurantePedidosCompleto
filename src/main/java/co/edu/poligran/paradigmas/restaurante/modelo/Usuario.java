@@ -12,4 +12,5 @@ public class Usuario implements Identificable {
     public String getUsuario() { return usuario; } public void setUsuario(String valor) { usuario=valor; }
     public String getContrasena() { return contrasena; } public void setContrasena(String valor) { contrasena=valor; }
     public Rol getRol() { return rol; } public void setRol(Rol valor) { rol=valor; }
+    @Override public String toString() { return "[" + id + "] " + nombre + " | " + usuario + " | " + rol; }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"><modelVersion>4.0.0</modelVersion>
   <groupId>co.edu.poligran.paradigmas</groupId><artifactId>restaurante-pedidos</artifactId><version>1.0</version>
-  <properties><maven.compiler.release>11</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding></properties>
+  <properties><maven.compiler.release>11</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding><exec.mainClass>co.edu.poligran.paradigmas.restaurante.RestauranteApp</exec.mainClass></properties>
 </project>

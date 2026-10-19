@@ -2,6 +2,7 @@ package co.edu.poligran.paradigmas.restaurante;
 
 import co.edu.poligran.paradigmas.restaurante.modelo.*;
 import co.edu.poligran.paradigmas.restaurante.negocio.*;
+import co.edu.poligran.paradigmas.restaurante.consola.PantallaMesero;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
@@ -21,10 +22,10 @@ public class RestauranteApp {
         System.out.println("Datos de prueba cargados. Mesero: mesero / 1234 | Domiciliario: domiciliario / 1234");
         int opcion;
         do {
-            System.out.println("\n=== SISTEMA DE RESTAURANTE ===\n1. Usuarios\n2. Catálogo\n3. Mesas\n4. Pedidos\n5. Reportes\n0. Salir");
+            System.out.println("\n=== SISTEMA DE RESTAURANTE ===\n1. Usuarios\n2. Catálogo\n3. Mesas\n4. Pedidos\n5. Reportes\n6. Mesero\n0. Salir");
             opcion = entero("Opción: ");
             try {
-                switch (opcion) { case 1: menuUsuarios(); break; case 2: menuCatalogo(); break; case 3: menuMesas(); break; case 4: menuPedidos(); break; case 5: menuReportes(); break; case 0: break; default: System.out.println("Opción inválida."); }
+                switch (opcion) { case 1: menuUsuarios(); break; case 2: menuCatalogo(); break; case 3: menuMesas(); break; case 4: menuPedidos(); break; case 5: menuReportes(); break; case 6: new PantallaMesero(SC, new MeseroManager(DATOS)).mostrar(); break; case 0: break; default: System.out.println("Opción inválida."); }
             } catch (IllegalArgumentException | IllegalStateException e) { System.out.println("Error: " + e.getMessage()); }
         } while (opcion != 0);
     }

@@ -12,6 +12,10 @@ Requiere Java 11 o superior y Maven. Desde la carpeta del proyecto:
 mvn compile exec:java
 ```
 
+### Interfaz gráfica (Swing, en construcción)
+
+La interfaz está en el paquete `vista`. Por ahora tiene la ventana principal con su menú y las pestañas de cada módulo. Para abrirla, ejecuta la clase `co.edu.poligran.paradigmas.restaurante.vista.RestauranteGUI`. En Visual Studio Code basta con abrir `RestauranteGUI.java` y pulsar **Run** sobre el método `main`.
+
 ## Datos de prueba
 
 Al iniciar se cargan datos locales con IDs fijos (`DatosPrueba`), y el programa muestra una guía con ellos:

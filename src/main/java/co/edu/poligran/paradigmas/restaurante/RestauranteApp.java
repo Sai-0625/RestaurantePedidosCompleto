@@ -3,6 +3,7 @@ package co.edu.poligran.paradigmas.restaurante;
 import co.edu.poligran.paradigmas.restaurante.modelo.*;
 import co.edu.poligran.paradigmas.restaurante.negocio.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,15 +18,17 @@ public class RestauranteApp {
     private static final ReportesManager REPORTES = new ReportesManager(DATOS);
 
     public static void main(String[] args) {
-        DatosPrueba.cargar(USUARIOS, CATALOGO, MESAS);
-        System.out.println("Datos de prueba cargados. Mesero: mesero / 1234 | Domiciliario: domiciliario / 1234");
-        int opcion;
+        DatosPrueba.cargar(USUARIOS, CATALOGO, MESAS, PEDIDOS);
+        System.out.println(DatosPrueba.guia());
+        int opcion = -1;
         do {
             System.out.println("\n=== SISTEMA DE RESTAURANTE ===\n1. Usuarios\n2. Catálogo\n3. Mesas\n4. Pedidos\n5. Reportes\n0. Salir");
-            opcion = entero("Opción: ");
             try {
+                opcion = entero("Opción: ");
                 switch (opcion) { case 1: menuUsuarios(); break; case 2: menuCatalogo(); break; case 3: menuMesas(); break; case 4: menuPedidos(); break; case 5: menuReportes(); break; case 0: break; default: System.out.println("Opción inválida."); }
-            } catch (IllegalArgumentException | IllegalStateException e) { System.out.println("Error: " + e.getMessage()); }
+            } catch (NumberFormatException e) { System.out.println("Error: debe escribir un número."); }
+            catch (DateTimeParseException e) { System.out.println("Error: la fecha debe tener el formato AAAA-MM-DD."); }
+            catch (IllegalArgumentException | IllegalStateException e) { System.out.println("Error: " + e.getMessage()); }
         } while (opcion != 0);
     }
 
@@ -34,7 +37,7 @@ public class RestauranteApp {
         switch (entero("Opción: ")) {
             case 1:
                 String nombre=texto("Nombre: "), usuario=texto("Usuario: "), clave=texto("Contraseña: ");
-                Rol rol=Rol.values()[entero("Rol (0 Mesero, 1 Cocina, 2 Administrador, 3 Domiciliario): ")];
+                Rol rol=elegir(Rol.values(),"Rol (0 Mesero, 1 Cocina, 2 Administrador, 3 Domiciliario): ");
                 Usuario nuevo;
                 if(rol==Rol.DOMICILIARIO) nuevo=new Domiciliario(nombre,usuario,clave,texto("Teléfono: "));
                 else if(rol==Rol.MESERO) nuevo=new Mesero(nombre,usuario,clave);
@@ -71,10 +74,10 @@ public class RestauranteApp {
     }
 
     private static void menuPedidos() {
-        System.out.println("\n1. Crear pedido  2. Agregar producto  3. Ver pendientes  4. Pasar a preparación  5. Marcar listo\n6. Asignar domiciliario  7. Entregar salón  8. Entregar domicilio  9. Cancelar  10. Ver total  11. Listar pedidos");
+        System.out.println("\n1. Crear pedido  2. Agregar producto  3. Ver pendientes  4. Pasar a preparación  5. Marcar listo\n6. Asignar domiciliario  7. Entregar salón  8. Entregar domicilio  9. Cancelar  10. Ver total  11. Listar pedidos\n12. Entregar para llevar");
         int opcion=entero("Opción: ");
         switch(opcion) {
-            case 1: TipoPedido tipo=TipoPedido.values()[entero("Tipo (0 Salón, 1 Para llevar, 2 Domicilio): ")]; int mesa=tipo==TipoPedido.SALON?entero("ID mesa: "):0; System.out.println("Pedido ID " + PEDIDOS.crear(mesa,entero("ID mesero: "),tipo).getId()); break;
+            case 1: TipoPedido tipo=elegir(TipoPedido.values(),"Tipo (0 Salón, 1 Para llevar, 2 Domicilio): "); int mesa=tipo==TipoPedido.SALON?entero("ID mesa: "):0; System.out.println("Pedido ID " + PEDIDOS.crear(mesa,entero("ID mesero: "),tipo).getId()); break;
             case 2: System.out.println("Detalle ID " + PEDIDOS.agregarProducto(entero("ID pedido: "),entero("ID producto: "),entero("Cantidad: ")).getId()); break;
             case 3: mostrar(PEDIDOS.verPendientes()); break;
             case 4: PEDIDOS.cambiarEstado(entero("ID pedido: "),EstadoPedido.EN_PREPARACION); System.out.println("Pedido en preparación."); break;
@@ -85,6 +88,7 @@ public class RestauranteApp {
             case 9: PEDIDOS.cancelar(entero("ID pedido: ")); System.out.println("Pedido cancelado."); break;
             case 10: System.out.println("Total: $" + PEDIDOS.calcularTotal(entero("ID pedido: "))); break;
             case 11: mostrar(PEDIDOS.listar()); break;
+            case 12: PEDIDOS.entregarParaLlevar(entero("ID pedido: ")); System.out.println("Pedido entregado."); break;
             default: break;
         }
     }
@@ -102,4 +106,5 @@ public class RestauranteApp {
     private static int entero(String mensaje) { return Integer.parseInt(texto(mensaje)); }
     private static double decimal(String mensaje) { return Double.parseDouble(texto(mensaje)); }
     private static LocalDate fecha(String mensaje) { return LocalDate.parse(texto(mensaje)); }
+    private static <T> T elegir(T[] opciones, String mensaje) { int i=entero(mensaje); if(i<0 || i>=opciones.length) throw new IllegalArgumentException("Opción fuera de rango"); return opciones[i]; }
 }

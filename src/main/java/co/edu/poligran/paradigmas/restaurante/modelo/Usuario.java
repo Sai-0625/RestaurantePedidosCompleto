@@ -5,7 +5,7 @@ public class Usuario implements Identificable {
     private int id; private String nombre; private String usuario; private String contrasena; private Rol rol;
     public Usuario() { }
     public Usuario(String nombre, String usuario, String contrasena, Rol rol) { this.nombre=nombre; this.usuario=usuario; this.contrasena=contrasena; this.rol=rol; }
-    public boolean iniciarSesion(String usuario, String contrasena) { return this.usuario.equals(usuario) && this.contrasena.equals(contrasena); }
+    public boolean iniciarSesion(String usuario, String contrasena) { return this.usuario.equalsIgnoreCase(usuario) && this.contrasena.equals(contrasena); }
     public void cerrarSesion() { }
     public int getId() { return id; } public void setId(int id) { this.id=id; }
     public String getNombre() { return nombre; } public void setNombre(String valor) { nombre=valor; }

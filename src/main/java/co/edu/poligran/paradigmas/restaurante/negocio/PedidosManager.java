@@ -23,6 +23,7 @@ public class PedidosManager {
     public DetallePedido agregarProducto(int idPedido, int idProducto, int cantidad) {
         Pedido pedido=datos.pedidos.buscarPorId(idPedido); Producto producto=datos.productos.buscarPorId(idProducto);
         if(pedido==null) throw new IllegalArgumentException("El pedido no existe");
+        if(pedido.getEstado()!=EstadoPedido.PENDIENTE && pedido.getEstado()!=EstadoPedido.EN_PREPARACION) throw new IllegalStateException("Solo se agregan productos a pedidos pendientes o en preparación");
         if(producto==null || !producto.isDisponible()) throw new IllegalArgumentException("El producto no está disponible");
         if(cantidad<=0) throw new IllegalArgumentException("La cantidad debe ser mayor que cero");
         DetallePedido detalle=new DetallePedido(idProducto,cantidad,producto.getPrecio()); detalle.setIdPedido(idPedido); return datos.detalles.crear(detalle);
@@ -37,6 +38,7 @@ public class PedidosManager {
     public boolean cambiarEstado(int idPedido, EstadoPedido nuevoEstado) {
         Pedido pedido=obtener(idPedido);
         if (!transicionValida(pedido.getEstado(), nuevoEstado)) throw new IllegalStateException("Transición de estado no permitida");
+        if (nuevoEstado==EstadoPedido.EN_PREPARACION && datos.detalles.listarPorPedido(idPedido).isEmpty()) throw new IllegalStateException("El pedido no tiene productos");
         pedido.setEstado(nuevoEstado); datos.pedidos.actualizar(pedido); datos.historial.crear(new HistorialEstado(idPedido,nuevoEstado));
         if(nuevoEstado==EstadoPedido.ENTREGADO || nuevoEstado==EstadoPedido.CANCELADO) liberarMesa(pedido);
         return true;
@@ -56,6 +58,7 @@ public class PedidosManager {
     }
     public boolean entregarDomicilio(int idPedido) { Pedido pedido=obtener(idPedido); if(pedido.getEstado()!=EstadoPedido.EN_CAMINO) throw new IllegalStateException("El pedido no está en camino"); Usuario u=datos.usuarios.buscarPorId(pedido.getIdDomiciliario()); if(u instanceof Domiciliario)((Domiciliario)u).setDisponible(true); return cambiarEstado(idPedido,EstadoPedido.ENTREGADO); }
     public boolean entregarSalon(int idPedido) { Pedido pedido=obtener(idPedido); if(pedido.getTipo()!=TipoPedido.SALON || pedido.getEstado()!=EstadoPedido.LISTO) throw new IllegalStateException("El pedido de salón debe estar listo"); return cambiarEstado(idPedido,EstadoPedido.ENTREGADO); }
+    public boolean entregarParaLlevar(int idPedido) { Pedido pedido=obtener(idPedido); if(pedido.getTipo()!=TipoPedido.PARA_LLEVAR || pedido.getEstado()!=EstadoPedido.LISTO) throw new IllegalStateException("El pedido para llevar debe estar listo"); return cambiarEstado(idPedido,EstadoPedido.ENTREGADO); }
     private boolean transicionValida(EstadoPedido actual,EstadoPedido nuevo) {
         if(nuevo==EstadoPedido.CANCELADO) return actual==EstadoPedido.PENDIENTE || actual==EstadoPedido.EN_PREPARACION;
         if(actual==EstadoPedido.PENDIENTE) return nuevo==EstadoPedido.EN_PREPARACION;

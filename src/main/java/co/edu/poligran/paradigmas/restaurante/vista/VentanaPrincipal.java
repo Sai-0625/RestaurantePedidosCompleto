@@ -1,5 +1,6 @@
 package co.edu.poligran.paradigmas.restaurante.vista;
 
+import co.edu.poligran.paradigmas.restaurante.modelo.Usuario;
 import co.edu.poligran.paradigmas.restaurante.negocio.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -7,12 +8,15 @@ import java.awt.event.KeyEvent;
 import javax.swing.*;
 
 /**
- * Ventana principal: JFrame con barra de menú, pestañas por módulo y barra de estado.
+ * Ventana principal: JFrame con barra de menú, pestañas por módulo y barra de estado con el usuario en sesión.
  * Cada pestaña es por ahora un panel provisional que se reemplaza en los pasos siguientes.
  */
 public class VentanaPrincipal extends JFrame {
     private static final String[] MODULOS = { "Usuarios", "Catálogo", "Mesas", "Pedidos", "Reportes" };
     private static final String[] PASOS = { "03", "04", "05", "06", "08" };
+
+    private final Usuario sesion;
+    private final Runnable alCerrarSesion;
 
     // Los managers se guardan para que los paneles de los pasos siguientes los usen.
     private final UsuariosManager usuarios;
@@ -24,8 +28,9 @@ public class VentanaPrincipal extends JFrame {
     private final JTabbedPane pestanas = new JTabbedPane();
     private final JLabel estado = new JLabel(" ");
 
-    public VentanaPrincipal(UsuariosManager usuarios, CatalogoManager catalogo, MesasManager mesas, PedidosManager pedidos, ReportesManager reportes) {
-        super("Sistema de Restaurante");
+    public VentanaPrincipal(Usuario sesion, UsuariosManager usuarios, CatalogoManager catalogo, MesasManager mesas, PedidosManager pedidos, ReportesManager reportes, Runnable alCerrarSesion) {
+        super("Sistema de Restaurante – " + sesion.getNombre());
+        this.sesion = sesion; this.alCerrarSesion = alCerrarSesion;
         this.usuarios = usuarios; this.catalogo = catalogo; this.mesas = mesas; this.pedidos = pedidos; this.reportes = reportes;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setJMenuBar(crearMenu());
@@ -43,8 +48,12 @@ public class VentanaPrincipal extends JFrame {
     private JMenuBar crearMenu() {
         JMenu archivo = new JMenu("Archivo");
         archivo.setMnemonic(KeyEvent.VK_A);
+        JMenuItem cerrarSesion = new JMenuItem("Cerrar sesión");
+        cerrarSesion.addActionListener(e -> cerrarSesion());
         JMenuItem salir = new JMenuItem("Salir");
         salir.addActionListener(e -> dispose());
+        archivo.add(cerrarSesion);
+        archivo.addSeparator();
         archivo.add(salir);
 
         JMenu ver = new JMenu("Ver");
@@ -75,7 +84,14 @@ public class VentanaPrincipal extends JFrame {
         return panel;
     }
 
+    /** Cierra esta ventana y vuelve a pedir el inicio de sesión. */
+    private void cerrarSesion() {
+        usuarios.cerrarSesion(sesion);
+        dispose();
+        alCerrarSesion.run();
+    }
+
     private void actualizarEstado() {
-        estado.setText("Módulo: " + MODULOS[pestanas.getSelectedIndex()] + "   |   Pedidos registrados: " + pedidos.listar().size());
+        estado.setText("Usuario: " + sesion.getNombre() + " (" + sesion.getRol() + ")   |   Módulo: " + MODULOS[pestanas.getSelectedIndex()] + "   |   Pedidos registrados: " + pedidos.listar().size());
     }
 }
